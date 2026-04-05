@@ -6,7 +6,7 @@
   <title>Dompetku — Expense Tracker</title>
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
@@ -17,22 +17,22 @@
       --surface:#FAFAFA;
       --card:#FFFFFF;
       --border:#E5E5E5;
-      --border2:#D0D0D0;
+      --border2:#B0B0B0;
       --ink:#000000;
       --ink2:#333333;
-      --muted:#666666;
-      --green-success:#000000;
+      --muted:#444444;
+      --green-success:#006644;
       --green-bg:#F0FFF0;
-      --green-border:#E0F2E0;
-      --red-danger:#000000;
+      --green-border:#B3E5CC;
+      --red-danger:#CC0000;
       --red-bg:#FFF0F0;
-      --red-border:#F0E0E0;
+      --red-border:#FFB3B3;
       --gold-warning:#000000;
       --gold-bg:#F5F5F5;
       --accent:#000000;
       --accent-hover:#333333;
-      --font-h:'Playfair Display',Georgia,serif;
-      --font-b:'Outfit',sans-serif;
+      --font-h:'Plus Jakarta Sans', sans-serif;
+      --font-b:'Plus Jakarta Sans', sans-serif;
       --radius:12px;
       --radius-lg:16px;
       --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
@@ -65,12 +65,13 @@
     .auth-header{margin-bottom:2.5rem;text-align:center}
     .auth-logo-mark{
       width:64px;height:64px;
-      background:var(--accent);
+      background:transparent;
+      border:2px solid var(--border);
       border-radius:var(--radius-lg);display:grid;place-items:center;
       font-size:28px;margin:0 auto 1.5rem;
-      box-shadow:var(--shadow-lg);transition:var(--transition)
+      box-shadow:none;transition:var(--transition)
     }
-    .auth-logo-mark:hover{transform:translateY(-2px);box-shadow:var(--shadow-xl)}
+    .auth-logo-mark:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border2)}
     .auth-title{font-family:var(--font-h);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
     .auth-title span{color:var(--accent)}
     .auth-tagline{font-size:.9rem;color:var(--muted);margin-top:8px;font-weight:400;line-height:1.5}
@@ -322,8 +323,8 @@
       border-radius:7px;cursor:pointer;display:grid;place-items:center;
       color:var(--muted);transition:all .2s;font-size:12px
     }
-    .icon-btn.edit:hover{border-color:#d97706;color:#d97706}
-    .icon-btn.del:hover{border-color:var(--red);color:var(--red)}
+    .icon-btn.edit:hover{border-color:#006644;color:#006644;background:#F0FFF0}
+    .icon-btn.del:hover{border-color:#CC0000;color:#CC0000;background:#FFF0F0}
 
     /* Empty / loading */
     .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
@@ -379,7 +380,7 @@
 <div id="auth-screen">
   <div class="auth-wrap">
     <div class="auth-header">
-      <div class="auth-logo-mark">💰</div>
+      <div class="auth-logo-mark"><img src="logo_wallet.png" alt="Dompetku Logo" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius-lg);"/></div>
       <div class="auth-title">Dompet<span>ku</span></div>
       <div class="auth-tagline">Catat pengeluaran & pemasukan dengan mudah</div>
     </div>
@@ -401,7 +402,7 @@
           <label>Password</label>
           <div class="input-wrap">
             <input type="password" id="login-pw" placeholder="Password kamu" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
-            <button class="toggle-pw" onclick="togglePw('login-pw',this)" type="button">👁</button>
+            <button class="toggle-pw" onclick="togglePw('login-pw',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <div class="forgot-link"><button onclick="doForgot()">Lupa password?</button></div>
         </div>
@@ -431,7 +432,7 @@
           <label>Password</label>
           <div class="input-wrap">
             <input type="password" id="reg-pw" placeholder="Min. 6 karakter" autocomplete="new-password" oninput="checkPw(this.value)"/>
-            <button class="toggle-pw" onclick="togglePw('reg-pw',this)" type="button">👁</button>
+            <button class="toggle-pw" onclick="togglePw('reg-pw',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
           <div class="strength-bar"><div class="strength-fill" id="str-fill"></div></div>
           <div class="pw-rules" id="pw-rules">
@@ -444,7 +445,7 @@
           <label>Konfirmasi Password</label>
           <div class="input-wrap">
             <input type="password" id="reg-pw2" placeholder="Ulangi password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"/>
-            <button class="toggle-pw" onclick="togglePw('reg-pw2',this)" type="button">👁</button>
+            <button class="toggle-pw" onclick="togglePw('reg-pw2',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
           </div>
         </div>
         <button class="btn btn-primary" id="btn-reg" onclick="doRegister()">
@@ -467,7 +468,7 @@
   <header>
     <div class="header-inner">
       <div class="logo">
-        <div class="logo-mark">💰</div>
+        <div class="logo-mark"><img src="logo_wallet.png" alt="Dompetku Logo" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius);"/></div>
         <span class="logo-name">Dompet<span>ku</span></span>
       </div>
       <div class="user-bar">
@@ -490,19 +491,19 @@
     <!-- Summary -->
     <div class="summary">
       <div class="sum-card balance">
-        <div class="sum-icon">💼</div>
+        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h8m-5-6h6m-6 4h6m6-10v12a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2z"/></svg></div>
         <div class="sum-label">Saldo Saat Ini</div>
         <div class="sum-amount" id="sum-balance">Rp 0</div>
         <div class="sum-count" id="sum-tx-count">0 transaksi</div>
       </div>
       <div class="sum-card income">
-        <div class="sum-icon">📈</div>
+        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg></div>
         <div class="sum-label">Total Pemasukan</div>
         <div class="sum-amount" id="sum-income">Rp 0</div>
         <div class="sum-count" id="sum-income-count">0 transaksi</div>
       </div>
       <div class="sum-card expense">
-        <div class="sum-icon">📉</div>
+        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/></svg></div>
         <div class="sum-label">Total Pengeluaran</div>
         <div class="sum-amount" id="sum-expense">Rp 0</div>
         <div class="sum-count" id="sum-expense-count">0 transaksi</div>
@@ -523,8 +524,8 @@
 
           <!-- Tipe toggle -->
           <div class="tipe-toggle">
-            <button class="tipe-btn income" id="btn-income" onclick="setTipe('Pemasukan')">⬆ Pemasukan</button>
-            <button class="tipe-btn expense active" id="btn-expense" onclick="setTipe('Pengeluaran')">⬇ Pengeluaran</button>
+            <button class="tipe-btn income" id="btn-income" onclick="setTipe('Pemasukan')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg>Pemasukan</button>
+            <button class="tipe-btn expense active" id="btn-expense" onclick="setTipe('Pengeluaran')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/><circle cx="12" cy="12" r="3"/></svg>Pengeluaran</button>
           </div>
           <input type="hidden" id="field-tipe" value="Pengeluaran"/>
 
@@ -542,19 +543,19 @@
             <label>Kategori *</label>
             <select id="field-kategori">
               <optgroup label="Pengeluaran">
-                <option value="Makanan & Minuman">🍜 Makanan & Minuman</option>
-                <option value="Transportasi">🚗 Transportasi</option>
-                <option value="Belanja">🛍 Belanja</option>
-                <option value="Hiburan">🎮 Hiburan</option>
-                <option value="Kesehatan">💊 Kesehatan</option>
-                <option value="Pendidikan">📚 Pendidikan</option>
-                <option value="Tagihan">⚡ Tagihan</option>
+                <option value="Makanan & Minuman">� Makanan & Minuman</option>
+                <option value="Transportasi">� Transportasi</option>
+                <option value="Belanja">� Belanja</option>
+                <option value="Hiburan">� Hiburan</option>
+                <option value="Kesehatan">� Kesehatan</option>
+                <option value="Pendidikan">� Pendidikan</option>
+                <option value="Tagihan">📄 Tagihan</option>
               </optgroup>
               <optgroup label="Pemasukan">
-                <option value="Gaji">💼 Gaji</option>
+                <option value="Gaji">� Gaji</option>
                 <option value="Freelance">💻 Freelance</option>
-                <option value="Investasi">📊 Investasi</option>
-                <option value="Hadiah">🎁 Hadiah</option>
+                <option value="Investasi">� Investasi</option>
+                <option value="Hadiah">� Hadiah</option>
               </optgroup>
               <option value="Lainnya">📌 Lainnya</option>
             </select>
@@ -574,11 +575,11 @@
 
           <div class="divider"></div>
           <button class="btn btn-primary" onclick="handleSubmit()">
-            <span id="btn-icon">＋</span>
+            <span id="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg></span>
             <span id="btn-text">Simpan ke Firebase</span>
           </button>
           <button class="btn btn-outline" id="btn-cancel" onclick="cancelEdit()" style="display:none;margin-top:8px">
-            ✕ Batalkan Edit
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Batalkan Edit
           </button>
         </div>
       </div>
@@ -621,7 +622,7 @@
 <!-- Delete modal -->
 <div class="overlay" id="del-overlay" onclick="closeDelModal(event)">
   <div class="modal">
-    <div class="modal-title">🗑 Hapus Transaksi?</div>
+    <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:8px;vertical-align:middle"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg>Hapus Transaksi?</div>
     <div class="modal-text" id="del-modal-txt">Transaksi ini akan dihapus permanen.</div>
     <div class="modal-actions">
       <button class="btn btn-danger" onclick="confirmDel()" style="flex:1">Ya, Hapus</button>
@@ -828,7 +829,7 @@
   function confirmDel(){
     if(!delTarget) return;
     txRef().child(delTarget).remove()
-      .then(()=>{ toast("info","🗑 Transaksi dihapus."); closeDelModal(); })
+      .then(()=>{ toast("info",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg>Transaksi dihapus.'); closeDelModal(); })
       .catch(e=>toast("error","❌ "+e.message));
   }
   function closeDelModal(e){
@@ -848,7 +849,7 @@
     document.getElementById("form-title").textContent = "Edit Transaksi";
     document.getElementById("form-tag").textContent   = "EDIT";
     document.getElementById("form-tag").classList.add("edit");
-    document.getElementById("btn-icon").textContent   = "✎";
+    document.getElementById("btn-icon").innerHTML   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/><circle cx="18" cy="5" r="2"/></svg>';
     document.getElementById("btn-text").textContent   = "Perbarui Data";
     document.getElementById("btn-cancel").style.display="block";
     document.querySelector(".panel").scrollIntoView({behavior:"smooth",block:"start"});
@@ -859,7 +860,7 @@
     document.getElementById("form-title").textContent ="Tambah Transaksi";
     document.getElementById("form-tag").textContent   ="BARU";
     document.getElementById("form-tag").classList.remove("edit");
-    document.getElementById("btn-icon").textContent   ="＋";
+    document.getElementById("btn-icon").innerHTML   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg>';
     document.getElementById("btn-text").textContent   ="Simpan ke Firebase";
     document.getElementById("btn-cancel").style.display="none";
   }
@@ -897,15 +898,15 @@
 
     if(!entries.length){
       list.innerHTML = Object.keys(allTx).length===0
-        ? `<div class="empty"><div class="empty-icon">💸</div><div class="empty-title">Belum ada transaksi</div><div style="font-size:.82rem">Tambahkan transaksi pertamamu di form sebelah kiri</div></div>`
-        : `<div class="empty"><div class="empty-icon">🔍</div><div class="empty-title">Tidak ada hasil</div><div style="font-size:.82rem">Coba ubah kata kunci atau filter</div></div>`;
+        ? `<div class="empty"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h8m-5-6h6m-6 4h6m6-10v12a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2z"/><circle cx="17" cy="17" r="3"/></svg></div><div class="empty-title">Belum ada transaksi</div><div style="font-size:.82rem">Tambahkan transaksi pertamamu di form sebelah kiri</div></div>`
+        : `<div class="empty"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><circle cx="11" cy="11" r="3"/></svg></div><div class="empty-title">Tidak ada hasil</div><div style="font-size:.82rem">Coba ubah kata kunci atau filter</div></div>`;
       return;
     }
 
     const catIcon={
-      "Makanan & Minuman":"🍜","Transportasi":"🚗","Belanja":"🛍","Hiburan":"🎮",
-      "Kesehatan":"💊","Pendidikan":"📚","Tagihan":"⚡","Gaji":"💼",
-      "Freelance":"💻","Investasi":"📊","Hadiah":"🎁","Lainnya":"📌"
+      "Makanan & Minuman":"�","Transportasi":"�","Belanja":"�","Hiburan":"�",
+      "Kesehatan":"�","Pendidikan":"�","Tagihan":"📄","Gaji":"�",
+      "Freelance":"💻","Investasi":"�","Hadiah":"�","Lainnya":"📌"
     };
 
     list.innerHTML = entries.map(([id,t])=>{
@@ -917,15 +918,15 @@
           <div class="tx-keterangan">${esc(t.keterangan||t.kategori)}</div>
           <div class="tx-meta">
             <span class="tx-cat ${isIn?"income":"expense"}">${esc(t.kategori)}</span>
-            <span class="tx-date">📅 ${fmtDate(t.tanggal)}</span>
+            <span class="tx-date"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fmtDate(t.tanggal)}</span>
           </div>
         </div>
         <div class="tx-amount ${isIn?"income":"expense"}">
           <span class="sign">${isIn?"+":"−"}</span>${fmtRupiah(t.nominal)}
         </div>
         <div class="tx-actions">
-          <button class="icon-btn edit" onclick="startEdit('${id}')" title="Edit">✎</button>
-          <button class="icon-btn del"  onclick="askDel('${id}','${esc(t.keterangan||t.kategori)}')" title="Hapus">🗑</button>
+          <button class="icon-btn edit" onclick="startEdit('${id}')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/><circle cx="18" cy="5" r="2"/></svg></button>
+          <button class="icon-btn del"  onclick="askDel('${id}','${esc(t.keterangan||t.kategori)}')" title="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg></button>
         </div>
       </div>`;
     }).join("");
@@ -950,7 +951,7 @@
   /* ── Password utils ───────────────────────────────────────── */
   function togglePw(id,btn){
     const el=document.getElementById(id), show=el.type==="password";
-    el.type=show?"text":"password"; btn.textContent=show?"🙈":"👁";
+    el.type=show?"text":"password"; btn.innerHTML=show?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 005.06 5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 00-2.16 3.19m-6.72-1.07a3 3 0 11-2.12-2.12c-.59.59-.59 1.54 0 2.12l2.12 2.12z"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
   }
   function checkPw(pw){
     document.getElementById("pw-rules").classList.add("show");
