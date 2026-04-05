@@ -483,7 +483,7 @@
 
   <div class="container">
     <div id="cfg-warn" class="hidden">
-      <span style="font-size:1.1rem;flex-shrink:0">⚠️</span>
+      <span style="font-size:1.1rem;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
       <div><strong>Firebase belum dikonfigurasi!</strong><br/>
       Aktifkan <code>Authentication</code> dan <code>Realtime Database</code> di Firebase Console.</div>
     </div>
@@ -543,19 +543,19 @@
             <label>Kategori *</label>
             <select id="field-kategori">
               <optgroup label="Pengeluaran">
-                <option value="Makanan & Minuman">� Makanan & Minuman</option>
-                <option value="Transportasi">� Transportasi</option>
-                <option value="Belanja">� Belanja</option>
-                <option value="Hiburan">� Hiburan</option>
-                <option value="Kesehatan">� Kesehatan</option>
-                <option value="Pendidikan">� Pendidikan</option>
+                <option value="Makanan & Minuman">🍽 Makanan & Minuman</option>
+                <option value="Transportasi">🚙 Transportasi</option>
+                <option value="Belanja">🛒 Belanja</option>
+                <option value="Hiburan">🎯 Hiburan</option>
+                <option value="Kesehatan">💉 Kesehatan</option>
+                <option value="Pendidikan">📖 Pendidikan</option>
                 <option value="Tagihan">📄 Tagihan</option>
               </optgroup>
               <optgroup label="Pemasukan">
-                <option value="Gaji">� Gaji</option>
+                <option value="Gaji">💵 Gaji</option>
                 <option value="Freelance">💻 Freelance</option>
-                <option value="Investasi">� Investasi</option>
-                <option value="Hadiah">� Hadiah</option>
+                <option value="Investasi">📈 Investasi</option>
+                <option value="Hadiah">🎀 Hadiah</option>
               </optgroup>
               <option value="Lainnya">📌 Lainnya</option>
             </select>
@@ -715,7 +715,7 @@
       await auth.signOut();
       skipRedirect=false;
       switchTab("login");
-      showInfo("🎉 Akun berhasil dibuat! Link verifikasi dikirim ke "+email+". Cek inbox kamu.");
+      showInfo('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6A2 2 0 01-2 2z"/></svg> Akun berhasil dibuat! Link verifikasi dikirim ke '+email+'. Cek inbox kamu.');
     } catch(e){ skipRedirect=false; showErr(errMsg(e.code)); }
     busy("btn-reg","reg-spin",false);
   }
@@ -736,7 +736,7 @@
         showErr("Email belum diverifikasi. Link baru dikirim ke "+email+".");
         busy("btn-login","login-spin",false); return;
       }
-      toast("success","✅ Berhasil masuk!");
+      toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6A2 2 0 01-2 2z"/></svg> Berhasil masuk!');
     } catch(e){ showErr(errMsg(e.code)); }
     busy("btn-login","login-spin",false);
   }
@@ -747,7 +747,7 @@
     const pv=new firebase.auth.GoogleAuthProvider();
     try {
       await auth.signInWithPopup(pv);
-      toast("success","✅ Berhasil masuk dengan Google!");
+      toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6A2 2 0 01-2 2z"/></svg> Berhasil masuk dengan Google!');
     } catch(e){
       if(e.code==="auth/operation-not-supported-in-this-environment"||e.code==="auth/popup-blocked"){
         try{ await auth.signInWithRedirect(pv); }
@@ -765,7 +765,7 @@
   }
 
   /* ── Logout ───────────────────────────────────────────────── */
-  async function doLogout(){ await auth.signOut(); toast("info","👋 Berhasil keluar."); }
+  async function doLogout(){ await auth.signOut(); toast("info",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 21H5a2 2 0 01-2-2v-6a2 2 0 012 2h4m6 0v6a2 2 0 01-2 2h-4m-6 0v-6a2 2 0 012-2h4m6 0v-6a2 2 0 01-2 2h-4"/><path d="M16 17l-4 4m0 0l4-4m0 0l-4 4"/></svg>Berhasil keluar.'); }
 
   /* ── Email action (verifyEmail link) ─────────────────────── */
   async function handleEmailAction(){
@@ -775,7 +775,7 @@
       try {
         await auth.applyActionCode(oob);
         switchTab("login");
-        showInfo("✅ Email berhasil diverifikasi! Silakan login.");
+        showInfo("<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6A2 2 0 01-2 2z"/></svg> Email berhasil diverifikasi! Silakan login.");
         window.history.replaceState({},"",window.location.pathname);
       } catch {
         showErr("Verifikasi gagal: link tidak valid atau kedaluwarsa.");
@@ -789,7 +789,7 @@
     detachDB();
     rtdbRef=db.ref("users/"+uid+"/transactions");
     rtdbRef.on("value",snap=>{ allTx=snap.val()||{}; renderTx(); renderSummary(); },
-      ()=>toast("error","❌ Gagal membaca data."));
+      ()=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Gagal membaca data."));
   }
   function detachDB(){ if(rtdbRef){rtdbRef.off();rtdbRef=null;} allTx={}; }
   function txRef(){ return db.ref("users/"+user.uid+"/transactions"); }
@@ -804,19 +804,19 @@
     const tanggal   = document.getElementById("field-tanggal").value;
     const editId    = document.getElementById("edit-id").value;
 
-    if(nominal<=0)  return toast("error","⚠️ Nominal harus lebih dari 0.");
-    if(!tanggal)    return toast("error","⚠️ Tanggal harus diisi.");
+    if(nominal<=0)  return toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Nominal harus lebih dari 0.');
+    if(!tanggal)    return toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Tanggal harus diisi.');
 
     const d={nominal,tipe,kategori,keterangan,tanggal,updatedAt:new Date().toISOString()};
     if(editId){
       txRef().child(editId).update(d)
-        .then(()=>{ toast("success","✅ Transaksi diperbarui!"); cancelEdit(); })
-        .catch(e=>toast("error","❌ "+e.message));
+        .then(()=>{ toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h14a2 2 0 012 2z"/></svg> Transaksi diperbarui!'); cancelEdit(); })
+        .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
     } else {
       d.createdAt=new Date().toISOString();
       txRef().push(d)
-        .then(()=>{ toast("success","🎉 Transaksi disimpan!"); clearForm(); })
-        .catch(e=>toast("error","❌ "+e.message));
+        .then(()=>{ toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M20 6L9 17l-5-5"/><path d="M20 12a4 4 0 01-4 4H4a4 4 0 01-4-4V6a2 2 0 012-2h16a2 2 0 012 2v6a2 2 0 01-2 2z"/></svg> Transaksi disimpan!'); clearForm(); })
+        .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
     }
   }
 
@@ -830,7 +830,7 @@
     if(!delTarget) return;
     txRef().child(delTarget).remove()
       .then(()=>{ toast("info",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg>Transaksi dihapus.'); closeDelModal(); })
-      .catch(e=>toast("error","❌ "+e.message));
+      .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
   }
   function closeDelModal(e){
     if(e&&e.target!==document.getElementById("del-overlay")) return;
@@ -904,9 +904,9 @@
     }
 
     const catIcon={
-      "Makanan & Minuman":"�","Transportasi":"�","Belanja":"�","Hiburan":"�",
-      "Kesehatan":"�","Pendidikan":"�","Tagihan":"📄","Gaji":"�",
-      "Freelance":"💻","Investasi":"�","Hadiah":"�","Lainnya":"📌"
+      "Makanan & Minuman":"🍽","Transportasi":"🚙","Belanja":"🛒","Hiburan":"🎯",
+      "Kesehatan":"💉","Pendidikan":"📖","Tagihan":"📄","Gaji":"💵",
+      "Freelance":"💻","Investasi":"📈","Hadiah":"🎀","Lainnya":"📌"
     };
 
     list.innerHTML = entries.map(([id,t])=>{
@@ -982,7 +982,7 @@
   }
 
   /* ── UI helpers ───────────────────────────────────────────── */
-  function showErr(m){ const e=document.getElementById("auth-error"); e.textContent="⚠️ "+m; e.classList.add("show"); }
+  function showErr(m){ const e=document.getElementById("auth-error"); e.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>'+m; e.classList.add("show"); }
   function clearErr() { document.getElementById("auth-error").classList.remove("show"); }
   function showInfo(m){ const e=document.getElementById("auth-info");  e.textContent=m; e.classList.add("show"); }
   function clearInfo(){ document.getElementById("auth-info").classList.remove("show"); }
