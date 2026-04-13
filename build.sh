@@ -1,6 +1,7 @@
 #!/bin/sh
-
-cat > firebase-config.js << EOF
+set -e
+mkdir -p public
+cat > public/firebase-config.js << EOF
 const firebaseConfig = {
   apiKey:            "${FIREBASE_API_KEY}",
   authDomain:        "${FIREBASE_AUTH_DOMAIN}",
@@ -12,4 +13,4 @@ const firebaseConfig = {
 };
 EOF
 
-echo "✅ firebase-config.js generated successfully"
+echo "OK: public/firebase-config.js generated"

@@ -1,4 +1,7 @@
 firebase-config.js
+public/firebase-config.js
+node_modules/
+dist/
 
 # OS & Editor
 .DS_Store

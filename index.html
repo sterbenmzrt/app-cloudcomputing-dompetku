@@ -10,595 +10,248 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
-  <style>
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    :root{
-      --bg:#FFFFFF;
-      --surface:#FAFAFA;
-      --card:#FFFFFF;
-      --border:#E5E5E5;
-      --border2:#B0B0B0;
-      --ink:#000000;
-      --ink2:#333333;
-      --muted:#444444;
-      --green-success:#006644;
-      --green-bg:#F0FFF0;
-      --green-border:#B3E5CC;
-      --red-danger:#CC0000;
-      --red-bg:#FFF0F0;
-      --red-border:#FFB3B3;
-      --gold-warning:#000000;
-      --gold-bg:#F5F5F5;
-      --accent:#000000;
-      --accent-hover:#333333;
-      --font-h:'Plus Jakarta Sans', sans-serif;
-      --font-b:'Plus Jakarta Sans', sans-serif;
-      --radius:12px;
-      --radius-lg:16px;
-      --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
-      --shadow-md:0 4px 6px rgba(0,0,0,.08),0 2px 4px rgba(0,0,0,.04);
-      --shadow-lg:0 10px 25px rgba(0,0,0,.1),0 6px 10px rgba(0,0,0,.06);
-      --shadow-xl:0 20px 40px rgba(0,0,0,.12);
-      --transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    html{scroll-behavior:smooth}
-    body{font-family:var(--font-b);background:var(--bg);color:var(--ink);min-height:100vh;line-height:1.6;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-
-    /* ═══ LOADING ═══════════════════════════════════════════════ */
-    #app-loading{
-      position:fixed;inset:0;background:var(--bg);display:grid;
-      place-items:center;z-index:999;transition:opacity .4s
-    }
-    #app-loading.hidden{opacity:0;pointer-events:none}
-    .load-logo{font-family:var(--font-h);font-size:2rem;font-weight:700;color:var(--ink);text-align:center;letter-spacing:-0.02em}
-    .load-logo span{color:var(--accent)}
-    .load-sub{font-size:.9rem;color:var(--muted);margin-top:8px;text-align:center;font-weight:400}
-    .spinner{width:28px;height:28px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s cubic-bezier(0.68, -0.55, 0.265, 1.55) infinite}
-
-    /* ═══ AUTH SCREEN ═══════════════════════════════════════════ */
-    #auth-screen{
-      min-height:100vh;display:none;place-items:center;padding:2rem 1rem;
-      background:var(--bg)
-    }
-    #auth-screen.show{display:grid}
-    .auth-wrap{width:min(440px,100%);animation:fadeUp .5s cubic-bezier(0.4, 0, 0.2, 1)}
-    .auth-header{margin-bottom:2.5rem;text-align:center}
-    .auth-logo-mark{
-      width:64px;height:64px;
-      background:transparent;
-      border:2px solid var(--border);
-      border-radius:var(--radius-lg);display:grid;place-items:center;
-      font-size:28px;margin:0 auto 1.5rem;
-      box-shadow:none;transition:var(--transition)
-    }
-    .auth-logo-mark:hover{transform:translateY(-2px);box-shadow:var(--shadow-md);border-color:var(--border2)}
-    .auth-title{font-family:var(--font-h);font-size:1.8rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
-    .auth-title span{color:var(--accent)}
-    .auth-tagline{font-size:.9rem;color:var(--muted);margin-top:8px;font-weight:400;line-height:1.5}
-    .auth-card{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius-lg);padding:2.5rem;box-shadow:var(--shadow-xl);backdrop-filter:blur(10px)
-    }
-    .auth-tabs{
-      display:flex;background:var(--card);border-radius:var(--radius);
-      padding:6px;margin-bottom:2rem;gap:6px;box-shadow:inset 0 1px 3px rgba(33,52,72,.05)
-    }
-    .auth-tab{
-      flex:1;padding:12px 0;border:none;border-radius:8px;
-      font-family:var(--font-b);font-size:.9rem;font-weight:600;
-      cursor:pointer;transition:var(--transition);background:transparent;color:var(--muted);position:relative
-    }
-    .auth-tab.active{background:var(--accent);color:#fff;font-weight:700}
-    .auth-tab:not(.active):hover{background:var(--surface);color:var(--ink)}
-
-    .form-group{margin-bottom:1rem}
-    label{display:block;font-size:.75rem;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px}
-    input,select,textarea{
-      width:100%;background:var(--surface);border:1.5px solid var(--border);
-      border-radius:var(--radius);color:var(--ink);font-family:var(--font-b);
-      font-size:.95rem;padding:12px 16px;outline:none;
-      transition:var(--transition);font-weight:400
-    }
-    input:focus,select:focus,textarea:focus{
-      border-color:var(--accent);
-      box-shadow:0 0 0 3px rgba(0,0,0,.08);background:var(--surface);transform:translateY(-1px)
-    }
-    select option{background:var(--surface)}
-    textarea{resize:vertical;min-height:76px}
-    input[type="number"]{font-family:var(--font-h);font-size:1rem}
-    input[type="date"]::-webkit-calendar-picker-indicator{opacity:.5;cursor:pointer}
-    .input-wrap{position:relative}
-    .input-wrap input{padding-right:44px}
-    .input-prefix{
-      position:absolute;left:13px;top:50%;transform:translateY(-50%);
-      font-size:.85rem;color:var(--muted);font-weight:600;pointer-events:none
-    }
-    .input-wrap-prefix input{padding-left:34px}
-    .toggle-pw{
-      position:absolute;right:12px;top:50%;transform:translateY(-50%);
-      background:none;border:none;cursor:pointer;color:var(--muted);font-size:15px;padding:4px
-    }
-    .toggle-pw:hover{color:var(--ink)}
-
-    .btn{
-      width:100%;padding:14px 0;border:none;border-radius:var(--radius);
-      font-family:var(--font-b);font-size:.95rem;font-weight:600;
-      cursor:pointer;transition:var(--transition);display:flex;
-      align-items:center;justify-content:center;gap:8px;margin-top:.5rem;position:relative;overflow:hidden
-    }
-    .btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .5s}
-    .btn:hover::before{left:100%}
-    .btn-primary{background:var(--accent);color:#fff;box-shadow:var(--shadow)}
-    .btn-primary:hover{background:var(--accent-hover);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-    .btn-primary:active{transform:translateY(0)}
-    .btn-primary:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
-    .btn-google{background:var(--surface);color:var(--ink);border:1.5px solid var(--border);margin-top:1rem;box-shadow:var(--shadow)}
-    .btn-google:hover{border-color:var(--border2);box-shadow:var(--shadow-md);transform:translateY(-1px)}
-    .btn-danger{background:var(--red-bg);color:var(--red);border:1.5px solid var(--red-border)}
-    .btn-danger:hover{background:#fecaca}
-    .btn-outline{background:transparent;color:var(--ink2);border:1.5px solid var(--border)}
-    .btn-outline:hover{border-color:var(--border2);color:var(--ink)}
-    .btn-sm{width:auto;padding:7px 16px;font-size:.8rem;border-radius:8px;margin-top:0}
-
-    .auth-divider{display:flex;align-items:center;gap:12px;margin:1rem 0;color:var(--muted);font-size:.75rem}
-    .auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border)}
-    .auth-error{background:var(--red-bg);border:1px solid var(--red-border);border-radius:9px;padding:10px 13px;font-size:.82rem;color:var(--red);margin-bottom:1rem;display:none}
-    .auth-error.show{display:block}
-    .auth-info{background:var(--green-bg);border:1px solid var(--green-border);border-radius:9px;padding:10px 13px;font-size:.82rem;color:var(--green);margin-bottom:1rem;display:none;line-height:1.5}
-    .auth-info.show{display:block}
-    .strength-bar{height:3px;border-radius:99px;background:var(--border);margin-top:5px;overflow:hidden}
-    .strength-fill{height:100%;border-radius:99px;transition:width .3s,background .3s;width:0}
-    .pw-rules{margin-top:7px;display:none}
-    .pw-rules.show{display:block}
-    .rule{display:flex;align-items:center;gap:6px;font-size:.73rem;color:var(--muted);margin-bottom:2px}
-    .rule.ok{color:var(--green)}
-    .rule-dot{width:5px;height:5px;border-radius:50%;background:var(--border2);flex-shrink:0}
-    .rule.ok .rule-dot{background:var(--green)}
-    .forgot-link{text-align:right;margin-top:5px}
-    .forgot-link button{background:none;border:none;color:var(--muted);font-size:.76rem;cursor:pointer;font-family:var(--font-b);padding:0}
-    .forgot-link button:hover{color:var(--accent)}
-    .auth-switch{text-align:center;margin-top:1.2rem;font-size:.81rem;color:var(--muted)}
-    .auth-switch button{background:none;border:none;color:var(--accent);font-weight:600;cursor:pointer;font-family:var(--font-b);font-size:.81rem}
-
-    /* ═══ MAIN APP ═══════════════════════════════════════════════ */
-    #app-screen{display:none}
-    #app-screen.show{display:block}
-
-    /* Header */
-    header{
-      background:var(--surface);border-bottom:1px solid var(--border);
-      padding:0 2rem;position:sticky;top:0;z-index:100;
-      box-shadow:0 1px 0 var(--border)
-    }
-    .header-inner{
-      max-width:1080px;margin:auto;display:flex;
-      align-items:center;justify-content:space-between;height:60px
-    }
-    .logo{display:flex;align-items:center;gap:10px}
-    .logo-mark{
-      width:36px;height:36px;background:var(--accent);
-      border-radius:var(--radius);display:grid;place-items:center;font-size:18px;box-shadow:var(--shadow-md);transition:var(--transition)
-    }
-    .logo:hover .logo-mark{transform:rotate(5deg) scale(1.05)}
-    .logo-name{font-family:var(--font-h);font-size:1.3rem;font-weight:700;color:var(--ink);letter-spacing:-0.01em}
-    .logo-name span{color:var(--accent)}
-    .user-bar{display:flex;align-items:center;gap:10px}
-    .user-chip{
-      display:flex;align-items:center;gap:8px;background:var(--bg);
-      border:1px solid var(--border);border-radius:99px;padding:4px 12px 4px 4px
-    }
-    .user-av{
-      width:28px;height:28px;border-radius:50%;
-      background:var(--accent);
-      display:grid;place-items:center;font-size:.75rem;font-weight:700;color:#fff;flex-shrink:0;box-shadow:var(--shadow)
-    }
-    .user-name{font-size:.8rem;color:var(--ink2);max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-    .logout-btn{
-      background:none;border:1px solid var(--border);border-radius:var(--radius);
-      color:var(--muted);font-family:var(--font-b);font-size:.78rem;font-weight:500;
-      padding:6px 12px;cursor:pointer;transition:var(--transition);
-    }
-    .logout-btn:hover{border-color:var(--red-danger);color:var(--red-danger);background:var(--red-bg)}
-
-    /* Layout */
-    .container{max-width:1080px;margin:auto;padding:2rem}
-    @media(max-width:780px){.container{padding:1.2rem}}
-
-    /* Summary cards */
-    .summary{
-      display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem
-    }
-    @media(max-width:600px){.summary{grid-template-columns:1fr}}
-    .sum-card{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius-lg);padding:1.8rem 2rem;
-      box-shadow:var(--shadow-md);position:relative;overflow:hidden;transition:var(--transition)
-    }
-    .sum-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-    .sum-card::after{
-      content:'';position:absolute;top:-20px;right:-20px;
-      width:80px;height:80px;border-radius:50%;opacity:.06
-    }
-    .sum-card.balance::after{background:var(--accent)}
-    .sum-card.income::after{background:var(--green)}
-    .sum-card.expense::after{background:var(--red)}
-    .sum-label{font-size:.75rem;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin-bottom:.6rem}
-    .sum-amount{
-      font-family:var(--font-h);font-size:1.8rem;font-weight:700;
-      line-height:1.1;word-break:break-all;letter-spacing:-0.01em
-    }
-    .sum-card.balance .sum-amount{color:var(--ink)}
-    .sum-card.income  .sum-amount{color:var(--green)}
-    .sum-card.expense .sum-amount{color:var(--red)}
-    .sum-count{font-size:.75rem;color:var(--muted);margin-top:.3rem}
-    .sum-icon{font-size:1.3rem;margin-bottom:.5rem}
-
-    /* Main grid */
-    .main-grid{
-      display:grid;grid-template-columns:340px 1fr;gap:1.5rem;align-items:start
-    }
-    @media(max-width:780px){.main-grid{grid-template-columns:1fr}}
-
-    /* Form panel */
-    .panel{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius-lg);padding:2rem;
-      box-shadow:var(--shadow-lg);position:sticky;top:76px;backdrop-filter:blur(10px)
-    }
-    .panel-title{
-      font-family:var(--font-h);font-size:1rem;font-weight:700;
-      color:var(--ink);margin-bottom:1.3rem;display:flex;align-items:center;gap:8px
-    }
-    .panel-title .tag{
-      font-family:var(--font-b);font-size:.68rem;font-weight:600;
-      background:var(--green-bg);color:var(--green);border:1px solid var(--green-border);
-      padding:2px 8px;border-radius:99px;letter-spacing:.3px
-    }
-    .panel-title .tag.edit{background:var(--gold-bg);color:var(--gold);border-color:#fde68a}
-
-    /* Tipe toggle */
-    .tipe-toggle{display:flex;gap:6px;margin-bottom:1rem}
-    .tipe-btn{
-      flex:1;padding:12px 0;border:1.5px solid var(--border);border-radius:var(--radius);
-      font-family:var(--font-b);font-size:.85rem;font-weight:600;
-      cursor:pointer;transition:var(--transition);background:transparent;color:var(--muted);position:relative;
-    }
-    .tipe-btn.income.active{background:var(--green-bg);border-color:var(--green-success);color:var(--green-success);box-shadow:var(--shadow)}
-    .tipe-btn.expense.active{background:var(--red-bg);border-color:var(--red-danger);color:var(--red-danger);box-shadow:var(--shadow)}
-    .tipe-btn:hover{border-color:var(--border2);transform:translateY(-1px)}
-
-    .divider{height:1px;background:var(--border);margin:.8rem 0}
-
-    /* Transactions */
-    .list-header{
-      display:flex;align-items:center;justify-content:space-between;
-      margin-bottom:1rem;flex-wrap:wrap;gap:.8rem
-    }
-    .list-title{font-family:var(--font-h);font-size:1rem;font-weight:700;color:var(--ink)}
-    .filter-row{display:flex;gap:6px;flex-wrap:wrap}
-    .filter-sel{
-      background:var(--surface);border:1px solid var(--border);border-radius:8px;
-      color:var(--ink2);font-family:var(--font-b);font-size:.78rem;
-      padding:6px 10px;outline:none;cursor:pointer;min-width:100px
-    }
-    .filter-sel:focus{border-color:var(--accent)}
-    .search-wrap{position:relative;flex:1;min-width:160px}
-    .search-wrap svg{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--muted);pointer-events:none}
-    .search-wrap input{padding:7px 10px 7px 32px;font-size:.82rem;border-radius:8px}
-
-    .tx-list{display:flex;flex-direction:column;gap:8px}
-    .tx-card{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);padding:1.2rem 1.5rem;
-      display:flex;align-items:center;gap:14px;
-      transition:var(--transition);animation:fadeUp .3s cubic-bezier(0.4, 0, 0.2, 1);position:relative
-    }
-    .tx-card:hover{border-color:var(--border2);box-shadow:var(--shadow-md);transform:translateX(2px)}
-    .tx-icon{
-      width:44px;height:44px;border-radius:var(--radius);display:grid;
-      place-items:center;font-size:1.2rem;flex-shrink:0;box-shadow:var(--shadow)
-    }
-    .tx-icon.income{background:var(--green-bg);color:var(--green-success)}
-    .tx-icon.expense{background:var(--red-bg);color:var(--red-danger)}
-    .tx-body{flex:1;min-width:0}
-    .tx-keterangan{font-size:.9rem;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .tx-meta{display:flex;align-items:center;gap:8px;margin-top:2px;flex-wrap:wrap}
-    .tx-cat{
-      font-size:.68rem;font-weight:600;padding:2px 8px;border-radius:99px;
-      letter-spacing:.3px;text-transform:uppercase
-    }
-    .tx-cat.income{background:var(--green-bg);color:var(--green-success);border:1px solid var(--green-border)}
-    .tx-cat.expense{background:var(--red-bg);color:var(--red-danger);border:1px solid var(--red-border)}
-    .tx-date{font-size:.72rem;color:var(--muted)}
-    .tx-amount{
-      font-family:var(--font-h);font-size:1rem;font-weight:700;
-      text-align:right;flex-shrink:0
-    }
-    .tx-amount.income{color:var(--green-success)}
-    .tx-amount.expense{color:var(--red-danger)}
-    .tx-amount .sign{font-size:.8rem}
-    .tx-actions{display:flex;gap:4px;flex-shrink:0}
-    .icon-btn{
-      width:28px;height:28px;border:1px solid var(--border);background:var(--bg);
-      border-radius:7px;cursor:pointer;display:grid;place-items:center;
-      color:var(--muted);transition:all .2s;font-size:12px
-    }
-    .icon-btn.edit:hover{border-color:#006644;color:#006644;background:#F0FFF0}
-    .icon-btn.del:hover{border-color:#CC0000;color:#CC0000;background:#FFF0F0}
-
-    /* Empty / loading */
-    .empty{text-align:center;padding:3rem 1rem;color:var(--muted)}
-    .empty-icon{font-size:2.2rem;margin-bottom:.6rem}
-    .empty-title{font-family:var(--font-h);font-size:1rem;color:var(--ink2);margin-bottom:.3rem}
-    .loading-txt{text-align:center;padding:2rem;color:var(--muted);font-size:.85rem}
-
-    /* Toast */
-    #toast-wrap{position:fixed;bottom:1.5rem;right:1.5rem;display:flex;flex-direction:column;gap:7px;z-index:999}
-    .toast{
-      background:var(--surface);border:1px solid var(--border);border-radius:10px;
-      padding:11px 16px;font-size:.83rem;font-weight:500;display:flex;align-items:center;gap:9px;
-      box-shadow:var(--shadow-lg);animation:slideUp .3s ease;max-width:300px;color:var(--ink)
-    }
-    .toast.success{border-left:3px solid var(--green)}
-    .toast.error  {border-left:3px solid var(--red)}
-    .toast.info   {border-left:3px solid var(--accent)}
-
-    /* Modal */
-    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(4px);z-index:200;display:none;place-items:center}
-    .overlay.open{display:grid}
-    .modal{
-      background:var(--surface);border:1px solid var(--border);
-      border-radius:var(--radius);padding:1.6rem;width:min(380px,90vw);
-      animation:fadeUp .25s ease;box-shadow:var(--shadow-lg)
-    }
-    .modal-title{font-family:var(--font-h);font-size:1.05rem;font-weight:700;margin-bottom:.8rem;color:var(--ink)}
-    .modal-text{font-size:.85rem;color:var(--ink2);margin-bottom:1.3rem;line-height:1.6}
-    .modal-actions{display:flex;gap:8px}
-    .modal-actions .btn{margin-top:0}
-
-    #cfg-warn{background:var(--red-bg);border:1px solid var(--red-border);border-radius:10px;padding:.9rem 1.2rem;margin-bottom:1.2rem;font-size:.82rem;color:var(--red);display:flex;gap:8px;align-items:flex-start}
-    #cfg-warn.hidden{display:none}
-    #cfg-warn code{background:rgba(84,119,146,.08);padding:1px 5px;border-radius:4px;font-size:.77rem}
-
-    @keyframes fadeUp {from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-    @keyframes spin   {to{transform:rotate(360deg)}}
-  </style>
 </head>
-<body>
+<body class="min-h-screen bg-white font-sans text-neutral-900 antialiased">
 
-<!-- ══ LOADING ════════════════════════════════════════════════ -->
-<div id="app-loading">
-  <div style="text-align:center">
-    <div class="load-logo">Dompet<span>ku</span></div>
-    <div class="load-sub">Memuat aplikasi...</div>
-    <div class="spinner" style="margin:14px auto 0"></div>
+<div id="app-loading" class="fixed inset-0 z-[999] grid place-items-center bg-white transition-opacity duration-500">
+  <div class="text-center">
+    <div class="text-3xl font-bold tracking-tight">Dompet<span class="text-neutral-600">ku</span></div>
+    <p class="mt-2 text-sm text-neutral-600">Memuat aplikasi...</p>
+    <div class="mx-auto mt-4 h-7 w-7 animate-spin rounded-full border-2 border-neutral-200 border-t-neutral-900" aria-hidden="true"></div>
   </div>
 </div>
 
-<!-- ══ AUTH SCREEN ═══════════════════════════════════════════ -->
-<div id="auth-screen">
-  <div class="auth-wrap">
-    <div class="auth-header">
-      <div class="auth-logo-mark"><img src="logo_wallet.svg" alt="Dompetku Logo" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius-lg);"/></div>
-      <div class="auth-title">Dompet<span>ku</span></div>
-      <div class="auth-tagline">Catat pengeluaran & pemasukan dengan mudah</div>
-    </div>
-    <div class="auth-card">
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-login"    onclick="switchTab('login')">Masuk</button>
-        <button class="auth-tab"        id="tab-register" onclick="switchTab('register')">Daftar</button>
+<div id="auth-screen" class="hidden grid min-h-screen place-items-center bg-white px-4 py-10">
+  <div class="w-full max-w-md">
+    <div class="mb-10 text-center">
+      <div class="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-2xl border-2 border-neutral-200 transition hover:-translate-y-0.5 hover:shadow-md">
+        <img src="/logo_wallet.svg" alt="" class="h-10 w-10 text-neutral-900" width="40" height="40"/>
       </div>
-      <div id="auth-error" class="auth-error"></div>
-      <div id="auth-info"  class="auth-info"></div>
+      <h1 class="text-3xl font-bold tracking-tight">Dompet<span class="text-neutral-600">ku</span></h1>
+      <p class="mt-2 text-sm text-neutral-600">Catat pengeluaran &amp; pemasukan dengan mudah</p>
+    </div>
+    <div class="rounded-2xl border border-neutral-200 bg-neutral-50 p-8 shadow-xl">
+      <div class="mb-8 flex gap-1.5 rounded-xl bg-white p-1.5 shadow-inner">
+        <button type="button" id="tab-login" class="flex-1 rounded-lg py-3 text-sm font-semibold transition bg-neutral-900 text-white shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2" onclick="switchTab('login')">Masuk</button>
+        <button type="button" id="tab-register" class="flex-1 rounded-lg py-3 text-sm font-semibold transition text-neutral-600 hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2" onclick="switchTab('register')">Daftar</button>
+      </div>
+      <div id="auth-error" class="mb-4 hidden items-start gap-2 rounded-lg border border-red-200 bg-red-50 p-3 text-sm leading-relaxed text-red-900" role="alert"></div>
+      <div id="auth-info" class="mb-4 hidden items-start gap-2 rounded-lg border border-emerald-200 bg-emerald-50 p-3 text-sm leading-relaxed text-emerald-900" role="status"></div>
 
-      <!-- LOGIN -->
       <div id="form-login">
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="login-email" placeholder="contoh@email.com" autocomplete="username"/>
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="login-email">Email</label>
+          <input id="login-email" type="email" autocomplete="username" placeholder="contoh@email.com" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm text-neutral-900 shadow-sm transition placeholder:text-neutral-400 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrap">
-            <input type="password" id="login-pw" placeholder="Password kamu" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"/>
-            <button class="toggle-pw" onclick="togglePw('login-pw',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="login-pw">Password</label>
+          <div class="relative">
+            <input id="login-pw" type="password" autocomplete="current-password" placeholder="Password kamu" onkeydown="if(event.key==='Enter')doLogin()" class="w-full rounded-xl border border-neutral-300 bg-white py-3 pl-4 pr-12 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
+            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 rounded p-1 text-neutral-500 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700" onclick="togglePw('login-pw',this)" aria-label="Tampilkan password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
-          <div class="forgot-link"><button onclick="doForgot()">Lupa password?</button></div>
+          <div class="mt-2 text-right">
+            <button type="button" class="border-none bg-transparent text-xs font-medium text-neutral-600 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 rounded" onclick="doForgot()">Lupa password?</button>
+          </div>
         </div>
-        <button class="btn btn-primary" id="btn-login" onclick="doLogin()">
-          <div id="login-spin" class="spinner" style="display:none;width:16px;height:16px;border-width:2px"></div>
+        <button type="button" id="btn-login" onclick="doLogin()" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 text-sm font-semibold text-white shadow transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 disabled:opacity-50">
+          <span id="login-spin" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true"></span>
           Masuk
         </button>
-        <div class="auth-divider">atau</div>
-        <button class="btn btn-google" onclick="doGoogle()">
-          <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <div class="my-4 flex items-center gap-3 text-xs text-neutral-500">
+          <span class="h-px flex-1 bg-neutral-200"></span> atau <span class="h-px flex-1 bg-neutral-200"></span>
+        </div>
+        <button type="button" onclick="doGoogle()" class="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-3.5 text-sm font-semibold text-neutral-900 shadow-sm transition hover:border-neutral-400 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+          <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           Masuk dengan Google
         </button>
-        <div class="auth-switch">Belum punya akun? <button onclick="switchTab('register')">Daftar →</button></div>
+        <p class="mt-5 text-center text-xs text-neutral-600">Belum punya akun? <button type="button" class="border-none bg-transparent font-semibold text-neutral-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 rounded" onclick="switchTab('register')">Daftar →</button></p>
       </div>
 
-      <!-- REGISTER -->
-      <div id="form-register" style="display:none">
-        <div class="form-group">
-          <label>Nama Lengkap</label>
-          <input type="text" id="reg-name" placeholder="Nama kamu" autocomplete="name"/>
+      <div id="form-register" class="hidden">
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="reg-name">Nama Lengkap</label>
+          <input id="reg-name" type="text" autocomplete="name" placeholder="Nama kamu" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
         </div>
-        <div class="form-group">
-          <label>Email</label>
-          <input type="email" id="reg-email" placeholder="contoh@email.com" autocomplete="username"/>
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="reg-email">Email</label>
+          <input id="reg-email" type="email" autocomplete="username" placeholder="contoh@email.com" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
         </div>
-        <div class="form-group">
-          <label>Password</label>
-          <div class="input-wrap">
-            <input type="password" id="reg-pw" placeholder="Min. 6 karakter" autocomplete="new-password" oninput="checkPw(this.value)"/>
-            <button class="toggle-pw" onclick="togglePw('reg-pw',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="reg-pw">Password</label>
+          <div class="relative">
+            <input id="reg-pw" type="password" autocomplete="new-password" placeholder="Min. 6 karakter" oninput="checkPw(this.value)" class="w-full rounded-xl border border-neutral-300 bg-white py-3 pl-4 pr-12 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
+            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 rounded p-1" onclick="togglePw('reg-pw',this)" aria-label="Tampilkan password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
           </div>
-          <div class="strength-bar"><div class="strength-fill" id="str-fill"></div></div>
-          <div class="pw-rules" id="pw-rules">
-            <div class="rule" id="r-len"><div class="rule-dot"></div> Min. 6 karakter</div>
-            <div class="rule" id="r-up"><div class="rule-dot"></div> Huruf kapital</div>
-            <div class="rule" id="r-num"><div class="rule-dot"></div> Mengandung angka</div>
+          <div class="mt-2 h-1 overflow-hidden rounded-full bg-neutral-200">
+            <div id="str-fill" class="h-full w-0 rounded-full transition-all duration-300"></div>
           </div>
-        </div>
-        <div class="form-group">
-          <label>Konfirmasi Password</label>
-          <div class="input-wrap">
-            <input type="password" id="reg-pw2" placeholder="Ulangi password" autocomplete="new-password" onkeydown="if(event.key==='Enter')doRegister()"/>
-            <button class="toggle-pw" onclick="togglePw('reg-pw2',this)" type="button"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+          <div id="pw-rules" class="mt-2 hidden space-y-1 text-xs text-neutral-600">
+            <div class="rule flex items-center gap-2" id="r-len"><span class="rule-dot h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400"></span> Min. 6 karakter</div>
+            <div class="rule flex items-center gap-2" id="r-up"><span class="rule-dot h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400"></span> Huruf kapital</div>
+            <div class="rule flex items-center gap-2" id="r-num"><span class="rule-dot h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-400"></span> Mengandung angka</div>
           </div>
         </div>
-        <button class="btn btn-primary" id="btn-reg" onclick="doRegister()">
-          <div id="reg-spin" class="spinner" style="display:none;width:16px;height:16px;border-width:2px"></div>
+        <div class="mb-4">
+          <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="reg-pw2">Konfirmasi Password</label>
+          <div class="relative">
+            <input id="reg-pw2" type="password" autocomplete="new-password" placeholder="Ulangi password" onkeydown="if(event.key==='Enter')doRegister()" class="w-full rounded-xl border border-neutral-300 bg-white py-3 pl-4 pr-12 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
+            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 rounded p-1" onclick="togglePw('reg-pw2',this)" aria-label="Tampilkan password">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </button>
+          </div>
+        </div>
+        <button type="button" id="btn-reg" onclick="doRegister()" class="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 text-sm font-semibold text-white shadow transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 disabled:opacity-50">
+          <span id="reg-spin" class="hidden h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white" aria-hidden="true"></span>
           Buat Akun
         </button>
-        <div class="auth-divider">atau</div>
-        <button class="btn btn-google" onclick="doGoogle()">
-          <svg width="17" height="17" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+        <div class="my-4 flex items-center gap-3 text-xs text-neutral-500">
+          <span class="h-px flex-1 bg-neutral-200"></span> atau <span class="h-px flex-1 bg-neutral-200"></span>
+        </div>
+        <button type="button" onclick="doGoogle()" class="flex w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-3.5 text-sm font-semibold text-neutral-900 shadow-sm transition hover:border-neutral-400 hover:shadow focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+          <svg width="17" height="17" viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.29-8.16 2.29-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
           Daftar dengan Google
         </button>
-        <div class="auth-switch">Sudah punya akun? <button onclick="switchTab('login')">Masuk →</button></div>
+        <p class="mt-5 text-center text-xs text-neutral-600">Sudah punya akun? <button type="button" class="border-none bg-transparent font-semibold text-neutral-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 rounded" onclick="switchTab('login')">Masuk →</button></p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ══ MAIN APP ═══════════════════════════════════════════════ -->
-<div id="app-screen">
-  <header>
-    <div class="header-inner">
-      <div class="logo">
-        <div class="logo-mark"><img src="logo_wallet.svg" alt="Dompetku Logo" style="width:100%;height:100%;object-fit:contain;border-radius:var(--radius);"/></div>
-        <span class="logo-name">Dompet<span>ku</span></span>
-      </div>
-      <div class="user-bar">
-        <div class="user-chip">
-          <div class="user-av" id="user-av">?</div>
-          <span class="user-name" id="user-name">—</span>
+<div id="app-screen" class="hidden">
+  <header class="sticky top-0 z-[100] border-b border-neutral-200 bg-neutral-50 shadow-sm">
+    <div class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-8">
+      <div class="flex items-center gap-2.5">
+        <div class="grid h-9 w-9 place-items-center rounded-xl bg-neutral-900 text-white shadow-md">
+          <img src="/logo_wallet.svg" alt="" class="h-6 w-6 invert" width="24" height="24"/>
         </div>
-        <button class="logout-btn" onclick="doLogout()">Keluar</button>
+        <span class="text-lg font-bold tracking-tight">Dompet<span class="text-neutral-600">ku</span></span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-2 rounded-full border border-neutral-200 bg-white py-1 pl-1 pr-3 text-xs">
+          <div id="user-av" class="grid h-7 w-7 place-items-center rounded-full bg-neutral-900 text-[10px] font-bold text-white shadow">?</div>
+          <span id="user-name" class="max-w-[8rem] truncate text-neutral-800 sm:max-w-[10rem]">—</span>
+        </div>
+        <button type="button" onclick="doLogout()" class="rounded-xl border border-neutral-300 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition hover:border-red-800 hover:bg-red-50 hover:text-red-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">Keluar</button>
       </div>
     </div>
   </header>
 
-  <div class="container">
-    <div id="cfg-warn" class="hidden">
-      <span style="font-size:1.1rem;flex-shrink:0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg></span>
-      <div><strong>Firebase belum dikonfigurasi!</strong><br/>
-      Aktifkan <code>Authentication</code> dan <code>Realtime Database</code> di Firebase Console.</div>
+  <main class="mx-auto max-w-5xl px-4 py-8 sm:px-8">
+    <div id="cfg-warn" class="mb-6 hidden items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4 text-sm leading-relaxed text-red-900" role="alert">
+      <span class="shrink-0 pt-0.5 text-red-900" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>
+      </span>
+      <div><strong>Firebase belum dikonfigurasi!</strong><br/>Aktifkan <code class="rounded bg-red-100/80 px-1 py-0.5 text-xs">Authentication</code> dan <code class="rounded bg-red-100/80 px-1 py-0.5 text-xs">Realtime Database</code> di Firebase Console.</div>
     </div>
 
-    <!-- Summary -->
-    <div class="summary">
-      <div class="sum-card balance">
-        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h8m-5-6h6m-6 4h6m6-10v12a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2z"/></svg></div>
-        <div class="sum-label">Saldo Saat Ini</div>
-        <div class="sum-amount" id="sum-balance">Rp 0</div>
-        <div class="sum-count" id="sum-tx-count">0 transaksi</div>
+    <div class="mb-8 grid gap-4 sm:grid-cols-3">
+      <div class="relative overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="mb-3 text-neutral-700" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8m-5-6h6m-6 4h6m6-10v12a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2z"/></svg></div>
+        <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-600">Saldo Saat Ini</div>
+        <div id="sum-balance" class="text-2xl font-bold tabular-nums tracking-tight text-neutral-900">Rp 0</div>
+        <div id="sum-tx-count" class="mt-1 text-xs text-neutral-600">0 transaksi</div>
       </div>
-      <div class="sum-card income">
-        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg></div>
-        <div class="sum-label">Total Pemasukan</div>
-        <div class="sum-amount" id="sum-income">Rp 0</div>
-        <div class="sum-count" id="sum-income-count">0 transaksi</div>
+      <div class="relative overflow-hidden rounded-2xl border border-emerald-200/80 bg-emerald-50/60 p-6 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="mb-3 text-emerald-800" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg></div>
+        <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-900">Total Pemasukan</div>
+        <div id="sum-income" class="text-2xl font-bold tabular-nums tracking-tight text-emerald-900">Rp 0</div>
+        <div id="sum-income-count" class="mt-1 text-xs text-emerald-800/90">0 transaksi</div>
       </div>
-      <div class="sum-card expense">
-        <div class="sum-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/></svg></div>
-        <div class="sum-label">Total Pengeluaran</div>
-        <div class="sum-amount" id="sum-expense">Rp 0</div>
-        <div class="sum-count" id="sum-expense-count">0 transaksi</div>
+      <div class="relative overflow-hidden rounded-2xl border border-red-200/80 bg-red-50/60 p-6 shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+        <div class="mb-3 text-red-900" aria-hidden="true"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/></svg></div>
+        <div class="mb-2 text-xs font-semibold uppercase tracking-wide text-red-900">Total Pengeluaran</div>
+        <div id="sum-expense" class="text-2xl font-bold tabular-nums tracking-tight text-red-900">Rp 0</div>
+        <div id="sum-expense-count" class="mt-1 text-xs text-red-800/90">0 transaksi</div>
       </div>
     </div>
 
-    <!-- Main grid -->
-    <div class="main-grid">
-
-      <!-- Form -->
+    <div class="grid gap-6 lg:grid-cols-[340px_1fr] lg:items-start">
       <div>
-        <div class="panel">
-          <div class="panel-title">
-            <span id="form-title">Tambah Transaksi</span>
-            <span class="tag" id="form-tag">BARU</span>
+        <div class="panel sticky top-[4.5rem] rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-lg backdrop-blur-sm">
+          <div class="mb-5 flex flex-wrap items-center gap-2">
+            <span id="form-title" class="text-base font-bold text-neutral-900">Tambah Transaksi</span>
+            <span id="form-tag" class="rounded-full border border-emerald-300 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-emerald-900">BARU</span>
           </div>
-          <input type="hidden" id="edit-id"/>
+          <input type="hidden" id="edit-id" value=""/>
 
-          <!-- Tipe toggle -->
-          <div class="tipe-toggle">
-            <button class="tipe-btn income" id="btn-income" onclick="setTipe('Pemasukan')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg>Pemasukan</button>
-            <button class="tipe-btn expense active" id="btn-expense" onclick="setTipe('Pengeluaran')"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/><circle cx="12" cy="12" r="3"/></svg>Pengeluaran</button>
+          <div class="mb-4 flex gap-1.5">
+            <button type="button" id="btn-income" onclick="setTipe('Pemasukan')" class="tipe-btn flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-neutral-200 bg-transparent py-3 text-sm font-semibold text-neutral-600 transition hover:border-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0" aria-hidden="true"><path d="M12 2v20M17 5l-5-3-5 3m10 14l-5 3-5-3"/><circle cx="12" cy="12" r="3"/></svg>
+              Pemasukan
+            </button>
+            <button type="button" id="btn-expense" onclick="setTipe('Pengeluaran')" class="tipe-btn flex flex-1 items-center justify-center gap-1 rounded-xl border-2 border-red-800 bg-red-50 py-3 text-sm font-semibold text-red-900 shadow-sm ring-1 ring-red-200 transition focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0" aria-hidden="true"><path d="M12 2v20M7 19l5 3 5-3M7 5l5-3 5 3"/></svg>
+              Pengeluaran
+            </button>
           </div>
           <input type="hidden" id="field-tipe" value="Pengeluaran"/>
 
-          <!-- Nominal -->
-          <div class="form-group">
-            <label>Nominal (Rp) *</label>
-            <div class="input-wrap input-wrap-prefix">
-              <span class="input-prefix">Rp</span>
-              <input type="number" id="field-nominal" placeholder="0" min="0" step="1000"/>
+          <div class="mb-4">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="field-nominal">Nominal (Rp) *</label>
+            <div class="relative">
+              <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-neutral-500">Rp</span>
+              <input id="field-nominal" type="number" min="0" step="1000" placeholder="0" class="w-full rounded-xl border border-neutral-300 bg-white py-3 pl-10 pr-4 text-sm tabular-nums focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
             </div>
           </div>
-
-          <!-- Kategori -->
-          <div class="form-group">
-            <label>Kategori *</label>
-            <select id="field-kategori">
+          <div class="mb-4">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="field-kategori">Kategori *</label>
+            <select id="field-kategori" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35">
               <optgroup label="Pengeluaran">
-                <option value="Makanan & Minuman">🍽 Makanan & Minuman</option>
-                <option value="Transportasi">🚙 Transportasi</option>
-                <option value="Belanja">🛒 Belanja</option>
-                <option value="Hiburan">🎯 Hiburan</option>
-                <option value="Kesehatan">💉 Kesehatan</option>
-                <option value="Pendidikan">📖 Pendidikan</option>
-                <option value="Tagihan">📄 Tagihan</option>
+                <option value="Makanan & Minuman">Makanan &amp; Minuman</option>
+                <option value="Transportasi">Transportasi</option>
+                <option value="Belanja">Belanja</option>
+                <option value="Hiburan">Hiburan</option>
+                <option value="Kesehatan">Kesehatan</option>
+                <option value="Pendidikan">Pendidikan</option>
+                <option value="Tagihan">Tagihan</option>
               </optgroup>
               <optgroup label="Pemasukan">
-                <option value="Gaji">💵 Gaji</option>
-                <option value="Freelance">💻 Freelance</option>
-                <option value="Investasi">📈 Investasi</option>
-                <option value="Hadiah">🎀 Hadiah</option>
+                <option value="Gaji">Gaji</option>
+                <option value="Freelance">Freelance</option>
+                <option value="Investasi">Investasi</option>
+                <option value="Hadiah">Hadiah</option>
               </optgroup>
-              <option value="Lainnya">📌 Lainnya</option>
+              <option value="Lainnya">Lainnya</option>
             </select>
           </div>
-
-          <!-- Keterangan -->
-          <div class="form-group">
-            <label>Keterangan</label>
-            <input type="text" id="field-keterangan" placeholder="Contoh: Makan siang di warteg" maxlength="100"/>
+          <div class="mb-4">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="field-keterangan">Keterangan</label>
+            <input id="field-keterangan" type="text" maxlength="100" placeholder="Contoh: Makan siang di warteg" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
           </div>
-
-          <!-- Tanggal -->
-          <div class="form-group">
-            <label>Tanggal *</label>
-            <input type="date" id="field-tanggal"/>
+          <div class="mb-5">
+            <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-neutral-600" for="field-tanggal">Tanggal *</label>
+            <input id="field-tanggal" type="date" class="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
           </div>
-
-          <div class="divider"></div>
-          <button class="btn btn-primary" onclick="handleSubmit()">
-            <span id="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg></span>
+          <div class="my-4 h-px bg-neutral-200"></div>
+          <button type="button" onclick="handleSubmit()" class="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 py-3.5 text-sm font-semibold text-white shadow transition hover:bg-neutral-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+            <span id="btn-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline-block align-middle" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg></span>
             <span id="btn-text">Simpan ke Firebase</span>
           </button>
-          <button class="btn btn-outline" id="btn-cancel" onclick="cancelEdit()" style="display:none;margin-top:8px">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>Batalkan Edit
+          <button type="button" id="btn-cancel" onclick="cancelEdit()" class="mt-2 hidden w-full items-center justify-center gap-2 rounded-xl border border-neutral-300 bg-white py-3 text-sm font-semibold text-neutral-800 transition hover:border-neutral-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="inline-block align-middle" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
+            Batalkan Edit
           </button>
         </div>
       </div>
 
-      <!-- Transaction list -->
       <div>
-        <div class="list-header">
-          <div class="list-title">Riwayat Transaksi</div>
-          <div class="filter-row">
-            <div class="search-wrap">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-              <input type="text" id="search-in" placeholder="Cari..." oninput="renderTx()"/>
+        <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+          <h2 class="text-base font-bold text-neutral-900">Riwayat Transaksi</h2>
+          <div class="flex flex-1 flex-wrap justify-end gap-1.5 sm:flex-initial">
+            <div class="relative min-w-[140px] flex-1 sm:flex-initial sm:min-w-[180px]">
+              <svg class="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-neutral-500" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+              <input id="search-in" type="text" placeholder="Cari..." oninput="renderTx()" class="w-full rounded-lg border border-neutral-300 bg-white py-2 pl-8 pr-2 text-xs focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35"/>
             </div>
-            <select class="filter-sel" id="fil-tipe" onchange="renderTx()">
+            <select id="fil-tipe" onchange="renderTx()" class="min-w-[7rem] rounded-lg border border-neutral-300 bg-white px-2 py-2 text-xs text-neutral-800 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35">
               <option value="">Semua Tipe</option>
               <option value="Pemasukan">Pemasukan</option>
               <option value="Pengeluaran">Pengeluaran</option>
             </select>
-            <select class="filter-sel" id="fil-kat" onchange="renderTx()">
+            <select id="fil-kat" onchange="renderTx()" class="min-w-[7rem] rounded-lg border border-neutral-300 bg-white px-2 py-2 text-xs text-neutral-800 focus:border-neutral-900 focus:outline-none focus:ring-2 focus:ring-blue-700/35">
               <option value="">Semua Kategori</option>
               <option>Makanan & Minuman</option><option>Transportasi</option>
               <option>Belanja</option><option>Hiburan</option><option>Kesehatan</option>
@@ -608,413 +261,35 @@
             </select>
           </div>
         </div>
-        <div id="tx-count" style="font-size:.76rem;color:var(--muted);margin-bottom:.8rem"></div>
-        <div class="tx-list" id="tx-list">
-          <div class="loading-txt">
-            <div class="spinner" style="margin:0 auto 8px"></div>Memuat transaksi...
+        <div id="tx-count" class="mb-3 text-xs text-neutral-600"></div>
+        <div id="tx-list" class="flex flex-col gap-2">
+          <div class="py-8 text-center text-sm text-neutral-600">
+            <div class="mx-auto mb-2 h-6 w-6 animate-spin rounded-full border-2 border-neutral-200 border-t-neutral-900" aria-hidden="true"></div>
+            Memuat transaksi...
           </div>
         </div>
       </div>
     </div>
-  </div>
+  </main>
 </div>
 
-<!-- Delete modal -->
-<div class="overlay" id="del-overlay" onclick="closeDelModal(event)">
-  <div class="modal">
-    <div class="modal-title"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:8px;vertical-align:middle"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg>Hapus Transaksi?</div>
-    <div class="modal-text" id="del-modal-txt">Transaksi ini akan dihapus permanen.</div>
-    <div class="modal-actions">
-      <button class="btn btn-danger" onclick="confirmDel()" style="flex:1">Ya, Hapus</button>
-      <button class="btn btn-outline" onclick="closeDelModal()" style="flex:1">Batalkan</button>
+<div id="del-overlay" class="fixed inset-0 z-[200] hidden place-items-center bg-black/40 p-4 backdrop-blur-sm" onclick="closeDelModal(event)">
+  <div class="w-full max-w-sm rounded-2xl border border-neutral-200 bg-neutral-50 p-6 shadow-xl" role="dialog" aria-modal="true" aria-labelledby="del-title" onclick="event.stopPropagation()">
+    <h3 id="del-title" class="mb-3 flex items-center gap-2 text-base font-bold text-neutral-900">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="shrink-0 text-red-900" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M10 11v6M14 11v6"/></svg>
+      Hapus Transaksi?
+    </h3>
+    <p id="del-modal-txt" class="mb-5 text-sm leading-relaxed text-neutral-700">Transaksi ini akan dihapus permanen.</p>
+    <div class="flex gap-2">
+      <button type="button" onclick="confirmDel()" class="flex-1 rounded-xl border border-red-300 bg-red-50 py-3 text-sm font-semibold text-red-900 transition hover:bg-red-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">Ya, Hapus</button>
+      <button type="button" onclick="closeDelModal()" class="flex-1 rounded-xl border border-neutral-300 bg-white py-3 text-sm font-semibold text-neutral-800 transition hover:bg-neutral-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2">Batalkan</button>
     </div>
   </div>
 </div>
-<div id="toast-wrap"></div>
 
-<!--
-  firebase-config.js dimuat di sini.
-  File ini di .gitignore — tidak akan ter-commit ke GitHub.
-  Salin firebase-config.example.js → firebase-config.js lalu isi config kamu.
--->
-<script src="firebase-config.js"></script>
-<script>
-  /* ── State ─────────────────────────────────────────────────── */
-  let db=null, auth=null, user=null, allTx={}, delTarget=null, rtdbRef=null;
-  let skipRedirect=false;
+<div id="toast-wrap" class="pointer-events-none fixed bottom-6 right-6 left-6 z-[999] flex flex-col items-end gap-2" role="region" aria-label="Notifikasi"></div>
 
-  /* ── Init ──────────────────────────────────────────────────── */
-  function initApp() {
-    try {
-      if (typeof firebaseConfig==="undefined") {
-        hideLoader(); showAuth();
-        document.getElementById("cfg-warn").classList.remove("hidden");
-        return;
-      }
-      
-      // Check if firebaseConfig contains placeholder values
-      if (firebaseConfig.apiKey === "ISI_API_KEY_KAMU" || 
-          firebaseConfig.authDomain === "nama-project-kamu.firebaseapp.com" ||
-          firebaseConfig.databaseURL === "https://nama-project-kamu-default-rtdb.asia-southeast1.firebasedatabase.app") {
-        hideLoader(); showAuth();
-        document.getElementById("cfg-warn").classList.remove("hidden");
-        return;
-      }
-      
-      if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-      db   = firebase.database();
-      auth = firebase.auth();
-
-      auth.getRedirectResult()
-        .then(r=>{ if(r&&r.user) toast("success","✅ Berhasil masuk dengan Google!"); })
-        .catch(e=>{ if(e.code&&e.code!=="auth/popup-closed-by-user") showErr(errMsg(e.code)); });
-
-      auth.onAuthStateChanged(u=>{
-        hideLoader();
-        if (u) {
-          if (skipRedirect) return;
-          if (!u.emailVerified && u.providerData.some(p=>p.providerId==="password")) {
-            auth.signOut(); showAuth(); return;
-          }
-          user=u; showMain(u);
-        } else { user=null; detachDB(); showAuth(); }
-      });
-      handleEmailAction();
-    } catch(e){ hideLoader(); showAuth(); showErr("Init gagal: "+e.message); }
-  }
-
-  function hideLoader(){ document.getElementById("app-loading").classList.add("hidden"); }
-  function showAuth(){
-    document.getElementById("auth-screen").classList.add("show");
-    document.getElementById("app-screen").classList.remove("show");
-  }
-  function showMain(u){
-    document.getElementById("auth-screen").classList.remove("show");
-    document.getElementById("app-screen").classList.add("show");
-    document.getElementById("user-av").textContent   = (u.displayName||u.email||"?")[0].toUpperCase();
-    document.getElementById("user-name").textContent = u.displayName||u.email;
-    document.getElementById("field-tanggal").value   = today();
-    attachDB(u.uid);
-  }
-
-  /* ── Auth tab ─────────────────────────────────────────────── */
-  function switchTab(t){
-    const l=t==="login";
-    document.getElementById("tab-login").classList.toggle("active",l);
-    document.getElementById("tab-register").classList.toggle("active",!l);
-    document.getElementById("form-login").style.display    = l?"block":"none";
-    document.getElementById("form-register").style.display = l?"none":"block";
-    clearErr(); clearInfo();
-  }
-
-  /* ── Register ─────────────────────────────────────────────── */
-  async function doRegister(){
-    const name=V("reg-name"), email=V("reg-email"), pw1=V("reg-pw"), pw2=V("reg-pw2");
-    clearErr(); clearInfo();
-    if(!name)          return showErr("Nama lengkap harus diisi.");
-    if(!email)         return showErr("Email harus diisi.");
-    if(pw1.length<6)   return showErr("Password minimal 6 karakter.");
-    if(pw1!==pw2)      return showErr("Konfirmasi password tidak cocok.");
-    busy("btn-reg","reg-spin",true);
-    try {
-      skipRedirect=true;
-      const c=await auth.createUserWithEmailAndPassword(email,pw1);
-      await c.user.updateProfile({displayName:name});
-      try { await c.user.sendEmailVerification({url:window.location.origin+window.location.pathname}); }
-      catch { await c.user.sendEmailVerification(); }
-      await auth.signOut();
-      skipRedirect=false;
-      switchTab("login");
-      showInfo('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6z"/></svg> Akun berhasil dibuat! Link verifikasi dikirim ke '+email+'. Cek inbox kamu.');
-    } catch(e){ skipRedirect=false; showErr(errMsg(e.code)); }
-    busy("btn-reg","reg-spin",false);
-  }
-
-  /* ── Login ────────────────────────────────────────────────── */
-  async function doLogin(){
-    const email=V("login-email"), pw=V("login-pw");
-    clearErr(); clearInfo();
-    if(!email) return showErr("Email harus diisi.");
-    if(!pw)    return showErr("Password harus diisi.");
-    busy("btn-login","login-spin",true);
-    try {
-      const r=await auth.signInWithEmailAndPassword(email,pw);
-      if(!r.user.emailVerified){
-        try { await r.user.sendEmailVerification({url:window.location.origin+window.location.pathname}); }
-        catch { try{await r.user.sendEmailVerification();}catch{} }
-        await auth.signOut();
-        showErr("Email belum diverifikasi. Link baru dikirim ke "+email+".");
-        busy("btn-login","login-spin",false); return;
-      }
-      toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6z"/></svg> Berhasil masuk!');
-    } catch(e){ showErr(errMsg(e.code)); }
-    busy("btn-login","login-spin",false);
-  }
-
-  /* ── Google ───────────────────────────────────────────────── */
-  async function doGoogle(){
-    clearErr();
-    const pv=new firebase.auth.GoogleAuthProvider();
-    try {
-      await auth.signInWithPopup(pv);
-      toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6z"/></svg> Berhasil masuk dengan Google!');
-    } catch(e){
-      if(e.code==="auth/operation-not-supported-in-this-environment"||e.code==="auth/popup-blocked"){
-        try{ await auth.signInWithRedirect(pv); }
-        catch(r){ showErr(errMsg(r.code)); }
-      } else if(e.code!=="auth/popup-closed-by-user"){ showErr(errMsg(e.code)); }
-    }
-  }
-
-  /* ── Forgot password ──────────────────────────────────────── */
-  async function doForgot(){
-    const email=V("login-email");
-    if(!email) return showErr("Masukkan email kamu terlebih dahulu.");
-    try { await auth.sendPasswordResetEmail(email); toast("info","📧 Link reset dikirim ke "+email); }
-    catch(e){ showErr(errMsg(e.code)); }
-  }
-
-  /* ── Logout ───────────────────────────────────────────────── */
-  async function doLogout(){ await auth.signOut(); toast("info",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 21H5a2 2 0 01-2-2v-6a2 2 0 012 2h4m6 0v6a2 2 0 01-2 2h-4m-6 0v-6a2 2 0 012-2h4m6 0v-6a2 2 0 01-2 2h-4"/><path d="M16 17l-4 4m0 0l4-4m0 0l-4 4"/></svg>Berhasil keluar.'); }
-
-  /* ── Email action (verifyEmail link) ─────────────────────── */
-  async function handleEmailAction(){
-    const p=new URLSearchParams(window.location.search);
-    const mode=p.get("mode"), oob=p.get("oobCode");
-    if(mode==="verifyEmail"&&oob){
-      try {
-        await auth.applyActionCode(oob);
-        switchTab("login");
-        showInfo('<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h16a2 2 0 012 2v6z"/></svg> Email berhasil diverifikasi! Silakan login.');
-        window.history.replaceState({},"",window.location.pathname);
-      } catch {
-        showErr("Verifikasi gagal: link tidak valid atau kedaluwarsa.");
-        window.history.replaceState({},"",window.location.pathname);
-      }
-    }
-  }
-
-  /* ── RTDB ─────────────────────────────────────────────────── */
-  function attachDB(uid){
-    detachDB();
-    rtdbRef=db.ref("users/"+uid+"/transactions");
-    rtdbRef.on("value",snap=>{ allTx=snap.val()||{}; renderTx(); renderSummary(); },
-      ()=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Gagal membaca data.'));
-  }
-  function detachDB(){ if(rtdbRef){rtdbRef.off();rtdbRef=null;} allTx={}; }
-  function txRef(){ return db.ref("users/"+user.uid+"/transactions"); }
-
-  /* ── CRUD ─────────────────────────────────────────────────── */
-  function handleSubmit(){
-    if(!user) return;
-    const nominal   = parseFloat(document.getElementById("field-nominal").value)||0;
-    const tipe      = document.getElementById("field-tipe").value;
-    const kategori  = document.getElementById("field-kategori").value;
-    const keterangan= V("field-keterangan");
-    const tanggal   = document.getElementById("field-tanggal").value;
-    const editId    = document.getElementById("edit-id").value;
-
-    if(nominal<=0)  return toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Nominal harus lebih dari 0.');
-    if(!tanggal)    return toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> Tanggal harus diisi.');
-
-    const d={nominal,tipe,kategori,keterangan,tanggal,updatedAt:new Date().toISOString()};
-    if(editId){
-      txRef().child(editId).update(d)
-        .then(()=>{ toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012 2h14a2 2 0 012 2z"/></svg> Transaksi diperbarui!'); cancelEdit(); })
-        .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
-    } else {
-      d.createdAt=new Date().toISOString();
-      txRef().push(d)
-        .then(()=>{ toast("success",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M20 6L9 17l-5-5"/><path d="M20 12a4 4 0 01-4 4H4a4 4 0 01-4-4V6a2 2 0 012-2h16a2 2 0 012 2v6a2 2 0 01-2 2z"/></svg> Transaksi disimpan!'); clearForm(); })
-        .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
-    }
-  }
-
-  function askDel(id,keterangan){
-    delTarget=id;
-    document.getElementById("del-modal-txt").textContent=
-      '"'+(keterangan||"Transaksi ini")+'" akan dihapus permanen dari Firebase.';
-    document.getElementById("del-overlay").classList.add("open");
-  }
-  function confirmDel(){
-    if(!delTarget) return;
-    txRef().child(delTarget).remove()
-      .then(()=>{ toast("info",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg>Transaksi dihapus.'); closeDelModal(); })
-      .catch(e=>toast("error",'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg> '+e.message));
-  }
-  function closeDelModal(e){
-    if(e&&e.target!==document.getElementById("del-overlay")) return;
-    document.getElementById("del-overlay").classList.remove("open"); delTarget=null;
-  }
-
-  function startEdit(id){
-    const t=allTx[id]; if(!t) return;
-    document.getElementById("edit-id").value          = id;
-    document.getElementById("field-nominal").value    = t.nominal||0;
-    document.getElementById("field-tipe").value       = t.tipe||"Pengeluaran";
-    document.getElementById("field-kategori").value   = t.kategori||"Lainnya";
-    document.getElementById("field-keterangan").value = t.keterangan||"";
-    document.getElementById("field-tanggal").value    = t.tanggal||today();
-    setTipe(t.tipe||"Pengeluaran");
-    document.getElementById("form-title").textContent = "Edit Transaksi";
-    document.getElementById("form-tag").textContent   = "EDIT";
-    document.getElementById("form-tag").classList.add("edit");
-    document.getElementById("btn-icon").innerHTML   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/><circle cx="18" cy="5" r="2"/></svg>';
-    document.getElementById("btn-text").textContent   = "Perbarui Data";
-    document.getElementById("btn-cancel").style.display="block";
-    document.querySelector(".panel").scrollIntoView({behavior:"smooth",block:"start"});
-  }
-  function cancelEdit(){
-    clearForm();
-    document.getElementById("edit-id").value          ="";
-    document.getElementById("form-title").textContent ="Tambah Transaksi";
-    document.getElementById("form-tag").textContent   ="BARU";
-    document.getElementById("form-tag").classList.remove("edit");
-    document.getElementById("btn-icon").innerHTML   = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle"><circle cx="12" cy="12" r="10"/><path d="M12 8v8m-4-4h8"/></svg>';
-    document.getElementById("btn-text").textContent   ="Simpan ke Firebase";
-    document.getElementById("btn-cancel").style.display="none";
-  }
-  function clearForm(){
-    document.getElementById("field-nominal").value="";
-    document.getElementById("field-keterangan").value="";
-    document.getElementById("field-tanggal").value=today();
-    setTipe("Pengeluaran");
-    document.getElementById("field-kategori").value="Makanan & Minuman";
-  }
-
-  /* ── Tipe toggle ──────────────────────────────────────────── */
-  function setTipe(t){
-    document.getElementById("field-tipe").value=t;
-    document.getElementById("btn-income").classList.toggle("active",t==="Pemasukan");
-    document.getElementById("btn-expense").classList.toggle("active",t==="Pengeluaran");
-  }
-
-  /* ── Render transactions ──────────────────────────────────── */
-  function renderTx(){
-    const list  = document.getElementById("tx-list");
-    const search= V("search-in").toLowerCase();
-    const fT    = document.getElementById("fil-tipe").value;
-    const fK    = document.getElementById("fil-kat").value;
-
-    const entries = Object.entries(allTx)
-      .filter(([,t])=>{
-        return (!search||(t.keterangan||"").toLowerCase().includes(search)||(t.kategori||"").toLowerCase().includes(search))
-          && (!fT||t.tipe===fT) && (!fK||t.kategori===fK);
-      })
-      .sort(([,a],[,b])=> a.tanggal<b.tanggal?1:-1);
-
-    document.getElementById("tx-count").textContent =
-      entries.length+" transaksi"+(search||fT||fK?" (difilter)":"");
-
-    if(!entries.length){
-      list.innerHTML = Object.keys(allTx).length===0
-        ? `<div class="empty"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M21 12V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h8m-5-6h6m-6 4h6m6-10v12a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2z"/><circle cx="17" cy="17" r="3"/></svg></div><div class="empty-title">Belum ada transaksi</div><div style="font-size:.82rem">Tambahkan transaksi pertamamu di form sebelah kiri</div></div>`
-        : `<div class="empty"><div class="empty-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/><circle cx="11" cy="11" r="3"/></svg></div><div class="empty-title">Tidak ada hasil</div><div style="font-size:.82rem">Coba ubah kata kunci atau filter</div></div>`;
-      return;
-    }
-
-    const catIcon={
-      "Makanan & Minuman":"🍽","Transportasi":"🚙","Belanja":"🛒","Hiburan":"🎯",
-      "Kesehatan":"💉","Pendidikan":"📖","Tagihan":"📄","Gaji":"💵",
-      "Freelance":"💻","Investasi":"📈","Hadiah":"🎀","Lainnya":"📌"
-    };
-
-    list.innerHTML = entries.map(([id,t])=>{
-      const isIn = t.tipe==="Pemasukan";
-      const icon = catIcon[t.kategori]||"📌";
-      return `<div class="tx-card">
-        <div class="tx-icon ${isIn?"income":"expense"}">${icon}</div>
-        <div class="tx-body">
-          <div class="tx-keterangan">${esc(t.keterangan||t.kategori)}</div>
-          <div class="tx-meta">
-            <span class="tx-cat ${isIn?"income":"expense"}">${esc(t.kategori)}</span>
-            <span class="tx-date"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${fmtDate(t.tanggal)}</span>
-          </div>
-        </div>
-        <div class="tx-amount ${isIn?"income":"expense"}">
-          <span class="sign">${isIn?"+":"−"}</span>${fmtRupiah(t.nominal)}
-        </div>
-        <div class="tx-actions">
-          <button class="icon-btn edit" onclick="startEdit('${id}')" title="Edit"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/><circle cx="18" cy="5" r="2"/></svg></button>
-          <button class="icon-btn del"  onclick="askDel('${id}','${esc(t.keterangan||t.kategori)}')" title="Hapus"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14zM10 11v6M14 11v6"/></svg></button>
-        </div>
-      </div>`;
-    }).join("");
-  }
-
-  /* ── Render summary ───────────────────────────────────────── */
-  function renderSummary(){
-    const arr=Object.values(allTx);
-    const income  = arr.filter(t=>t.tipe==="Pemasukan");
-    const expense = arr.filter(t=>t.tipe==="Pengeluaran");
-    const totalIn = income.reduce((s,t)=>s+(+t.nominal||0),0);
-    const totalEx = expense.reduce((s,t)=>s+(+t.nominal||0),0);
-    const bal     = totalIn-totalEx;
-    document.getElementById("sum-balance").textContent       = (bal<0?"−":"")+"Rp "+fmtRupiah(Math.abs(bal));
-    document.getElementById("sum-income").textContent        = "Rp "+fmtRupiah(totalIn);
-    document.getElementById("sum-expense").textContent       = "Rp "+fmtRupiah(totalEx);
-    document.getElementById("sum-tx-count").textContent      = arr.length+" transaksi";
-    document.getElementById("sum-income-count").textContent  = income.length+" transaksi";
-    document.getElementById("sum-expense-count").textContent = expense.length+" transaksi";
-  }
-
-  /* ── Password utils ───────────────────────────────────────── */
-  function togglePw(id,btn){
-    const el=document.getElementById(id), show=el.type==="password";
-    el.type=show?"text":"password"; btn.innerHTML=show?'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0112 20c-7 0-11-8-11-8a18.45 18.45 0 005.06 5.94M9.9 4.24A9.12 9.12 0 0112 4c7 0 11 8 11 8a18.5 18.5 0 00-2.16 3.19m-6.72-1.07a3 3 0 11-2.12-2.12c-.59.59-.59 1.54 0 2.12l2.12 2.12z"/><line x1="1" y1="1" x2="23" y2="23"/></svg>':'<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
-  }
-  function checkPw(pw){
-    document.getElementById("pw-rules").classList.add("show");
-    const l=pw.length>=6, u=/[A-Z]/.test(pw), n=/[0-9]/.test(pw);
-    setR("r-len",l); setR("r-up",u); setR("r-num",n);
-    const s=[l,u,n].filter(Boolean).length;
-    const f=document.getElementById("str-fill");
-    f.style.width=["0%","33%","66%","100%"][s];
-    f.style.background=["","#547792","#547792","#213448"][s];
-  }
-  function setR(id,ok){ document.getElementById(id).classList.toggle("ok",ok); }
-
-  /* ── Error messages ───────────────────────────────────────── */
-  function errMsg(c){
-    return({
-      "auth/email-already-in-use":   "Email sudah digunakan akun lain.",
-      "auth/invalid-email":          "Format email tidak valid.",
-      "auth/weak-password":          "Password terlalu lemah (min. 6 karakter).",
-      "auth/user-not-found":         "Akun tidak ditemukan.",
-      "auth/wrong-password":         "Password yang kamu masukkan salah.",
-      "auth/invalid-credential":     "Email atau password salah.",
-      "auth/too-many-requests":      "Terlalu banyak percobaan. Coba lagi nanti.",
-      "auth/network-request-failed": "Koneksi gagal. Periksa internet.",
-      "auth/user-disabled":          "Akun ini telah dinonaktifkan.",
-      "auth/popup-blocked":          "Pop-up diblokir browser.",
-      "auth/unauthorized-domain":    "Domain ini belum diizinkan di Firebase. Tambahkan di Authorized Domains.",
-    })[c]||("Error: "+c);
-  }
-
-  /* ── UI helpers ───────────────────────────────────────────── */
-  function showErr(m){ const e=document.getElementById("auth-error"); e.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;margin-right:4px;vertical-align:middle"><path d="M10.29 3.86L1.82 18a4 4 0 004 4h10a4 4 0 004-4L13.71 3.86a2 2 0 00-1.42 0L10 5.17l2.29 2.29a2 2 0 011.42 0L21 18a4 4 0 00-4-4h-10a4 4 0 00-4 4l2.29-2.29a2 2 0 01.42 0L10 5.17z"/><path d="M12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>'+m; e.classList.add("show"); }
-  function clearErr() { document.getElementById("auth-error").classList.remove("show"); }
-  function showInfo(m){ const e=document.getElementById("auth-info");  e.textContent=m; e.classList.add("show"); }
-  function clearInfo(){ document.getElementById("auth-info").classList.remove("show"); }
-  function busy(b,s,on){ document.getElementById(b).disabled=on; document.getElementById(s).style.display=on?"inline-block":"none"; }
-  function toast(type,msg){
-    const c=document.getElementById("toast-wrap"), el=document.createElement("div");
-    el.className="toast "+type; el.textContent=msg; c.appendChild(el);
-    setTimeout(()=>el.remove(),3500);
-  }
-  function V(id){ return document.getElementById(id).value.trim(); }
-  function esc(s){ return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
-  function today(){ return new Date().toISOString().slice(0,10); }
-  function fmtDate(d){
-    if(!d) return "—";
-    const [y,m,day]=d.split("-");
-    return parseInt(day)+" "+["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Ags","Sep","Okt","Nov","Des"][m-1]+" "+y;
-  }
-  function fmtRupiah(n){
-    return Math.abs(+n||0).toLocaleString("id-ID");
-  }
-
-  initApp();
-</script>
+<script src="/firebase-config.js"></script>
+<script type="module" src="/src/main.js"></script>
 </body>
 </html>
